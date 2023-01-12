@@ -7,7 +7,8 @@ import "./css/Detail.less";
 import { reducersType } from "../../../redux/reducers";
 import { reqCategoryList, reqProdById } from "../../../api";
 import { BASE_URL } from "../../../config";
-import { CategoryListType, ProductByIdType, ProductType } from "../../../type/api";
+import { ProductByIdType, ProductType } from "../../../type/Product";
+import { CategoryListType } from "../../../type/Category";
 
 const { Item } = List;
 
@@ -146,9 +147,7 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
         </Item>
         <Item>
           <span className="prod-detail">商品详情: </span>
-          <span
-            dangerouslySetInnerHTML={{ __html: productData.detail }}
-          ></span>
+          <span dangerouslySetInnerHTML={{ __html: productData.detail }}></span>
         </Item>
       </List>
     </Card>

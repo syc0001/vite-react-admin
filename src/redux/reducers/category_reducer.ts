@@ -1,4 +1,4 @@
-import { CategoryObjType } from "../../type/api";
+import { CategoryObjType } from "../../type/Category";
 import { SAVE_CATEGORY_LIST } from "../action_types";
 import { action_types } from "./action_types";
 

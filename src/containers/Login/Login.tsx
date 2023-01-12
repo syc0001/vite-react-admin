@@ -9,7 +9,7 @@ import { reducersType } from "../../redux/reducers";
 import { createSaveUserInfoAction } from "../../redux/actions_creators/login_action";
 import { reqLogin } from "../../api";
 import "./css/Login.less";
-import { LoginType } from "../../type/api";
+import { LoginType } from "../../type/Login";
 
 const { Item } = Form;
 

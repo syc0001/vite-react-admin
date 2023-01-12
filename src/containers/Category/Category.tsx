@@ -1,31 +1,41 @@
-import { FC, useEffect, useState } from "react";
-import { Button, Card, message, Modal, Table, Form, Input } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
-import { connect } from "react-redux";
-import { reqAddCategory, reqCategoryList, reqUpdateCategory } from "../../api";
-import { PAGE_SIZE } from "../../config";
-import { RuleObject } from "antd/lib/form";
-import { reducersType } from "../../redux/reducers";
-import { createSaveCategoryListAction } from "../../redux/actions_creators/category_action";
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+import {FC, useEffect, useState} from "react";
+import {Button, Card, message, Modal, Table, Form, Input} from "antd";
+import {PlusCircleOutlined} from "@ant-design/icons";
+import {connect} from "react-redux";
+import {reqAddCategory, reqCategoryList, reqUpdateCategory} from "../../api";
+import {PAGE_SIZE} from "../../config";
+import {RuleObject} from "antd/lib/form";
+import {reducersType} from "../../redux/reducers";
+import {createSaveCategoryListAction} from "../../redux/actions_creators/category_action";
 import {
   AddCategoryType,
   NewCategoryObjType,
   CategoryObjType,
   CategoryListType,
-  UpdateCategoryStatusType,
-} from "../../type/api";
-import { ColumnsType } from "antd/es/table";
+  UpdateCategoryType,
+} from "../../type/Category";
+import {ColumnsType} from "antd/es/table";
 
-const { Item } = Form;
+const {Item} = Form;
 
 const mapStateToProps = (state: reducersType) => ({});
 
-const mapDispatchToProps = { saveCategory: createSaveCategoryListAction };
+const mapDispatchToProps = {saveCategory: createSaveCategoryListAction};
 
 type CategoryProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
 
 // let initialTitle = "";
+
+/**
+ * @description 分类页面
+ * @param {CategoryProps} props
+ * @constructor
+ */
 const Category: FC<CategoryProps> = (props: CategoryProps) => {
   const [categoryList, setCategoryList] = useState<CategoryObjType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +60,8 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
             type="link"
             onClick={() => {
               setInitialTitle(operatorData.name);
-              setTimeout(() => {}, 300);
+              setTimeout(() => {
+              }, 300);
               showModal("update", operatorData);
             }}
           >
@@ -66,7 +77,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
   const getCategoryList = async () => {
     let result = (await reqCategoryList()) as unknown as CategoryListType;
     setLoading(false);
-    const { status, data, msg } = result;
+    const {status, data, msg} = result;
     if (status === 0) {
       setCategoryList(data);
       props.saveCategory(data);
@@ -86,7 +97,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
   //Component Callback
   const toAdd = async (values: string) => {
     let result = (await reqAddCategory(values)) as unknown as AddCategoryType;
-    const { status, data, msg } = result;
+    const {status, data, msg} = result;
     if (status === 0) {
       message.success("新增商品分类成功", 1);
       let newData = [data, ...categoryList];
@@ -101,8 +112,8 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
   const toUpdate = async (categoryObj: NewCategoryObjType) => {
     let result = (await reqUpdateCategory(
       categoryObj
-    )) as unknown as UpdateCategoryStatusType;
-    const { status, msg } = result;
+    )) as unknown as UpdateCategoryType;
+    const {status, msg} = result;
     if (status === 0) {
       message.success("更新分类名称成功", 1);
       getCategoryList();
@@ -122,7 +133,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
         } else if (operType === "update") {
           const categoryId = modalCurrentValue;
           const categoryName = value.categoryName;
-          const categoryObj: NewCategoryObjType = { categoryId, categoryName };
+          const categoryObj: NewCategoryObjType = {categoryId, categoryName};
           toUpdate(categoryObj);
         }
       })
@@ -168,14 +179,14 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
             <PlusCircleOutlined></PlusCircleOutlined>添加
           </Button>
         }
-        style={{ width: "100%" }}
+        style={{width: "100%"}}
       >
         <Table
           dataSource={categoryList}
           columns={columns}
           bordered
           rowKey={"_id"}
-          pagination={{ pageSize: PAGE_SIZE, showQuickJumper: true }}
+          pagination={{pageSize: PAGE_SIZE, showQuickJumper: true}}
           loading={isLoading}
         />
       </Card>
@@ -187,13 +198,13 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form name="basic" initialValues={{ remember: false }} form={form}>
+        <Form name="basic" initialValues={{remember: false}} form={form}>
           <Item
             name="categoryName"
             initialValue={initialTitle}
-            rules={[{ validator: inputValidator }]}
+            rules={[{validator: inputValidator}]}
           >
-            <Input placeholder="请输入商品分类名称" />
+            <Input placeholder="请输入商品分类名称"/>
           </Item>
         </Form>
       </Modal>

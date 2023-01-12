@@ -1,3 +1,7 @@
+/**
+ * @description 全局Axios配置
+ * @author ShiYiChuang
+ */
 import { message } from "antd";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import NProgress from "nprogress";
@@ -10,11 +14,13 @@ const instance = axios.create({
   timeout: 4000,
 });
 
-//请求拦截器
+//添加请求拦截器
 instance.interceptors.request.use((config) => {
+  // 进度条开始
   NProgress.start();
   const { token } = store.getState().userInfo;
   if (token) {
+    // 在请求头部加上 Authorization
     config.headers!.Authorization = token;
   }
   const { method, data } = config;
@@ -26,21 +32,26 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-//响应拦截器
+//添加响应拦截器
 instance.interceptors.response.use(
   (config: AxiosResponse) => {
+    //进度条关闭
     NProgress.done();
     return config.data;
   },
   (error: AxiosError) => {
+    //进度条关闭
     NProgress.done();
+    // 验证状态
     if (error.response?.status === 401) {
       message.error("身份校验失败,请重新登录", 1);
+      //初发redux,删除用户cookie
       store.dispatch(createDeleteUserInfoAction());
     } else {
       message.error(error.message);
     }
-    return new Promise((resolve, reject) => {});
+    // 返回pending状态,中断Promise链
+    return new Promise(() => {});
   }
 );
 

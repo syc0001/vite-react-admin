@@ -1,3 +1,7 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
 import { lazy, Suspense } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 
@@ -29,6 +33,9 @@ import Login from "../containers/Login/Login";
 // const Admin = lazy(() => import("../containers/Admin/Admin"));
 // const Login = lazy(() => import("../containers/Login/Login"));
 
+/**
+ * @description 路由表
+ */
 const routers: RouteObject[] = [
   {
     path: "/login",

@@ -1,19 +1,22 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
 import { FC, useEffect, useRef, useState } from "react";
 import { useMatch, useNavigate } from "react-router-dom";
 import { Button, Card, Form, Input, message, Select } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
 import { reducersType } from "../../../redux/reducers";
-import { reqCategoryList } from "../../../api";
-import {
-  AddProductType,
-  CategoryListType,
-  CategoryObjType,
-} from "../../../type/api";
+import { reqAddProduct, reqCategoryList } from "../../../api";
+import { CategoryListType, CategoryObjType } from "../../../type/Category";
+import { AddProductReturnType, AddProductType } from "../../../type/Product";
 import PictureWall, {
-  useImperativeHandleReturnType,
+  PictualWalluseImperativeHandleReturnType,
 } from "./Picture_Wall/PictureWall";
-import RichTextEditor from "./RichTextEditor/RichTextEditor";
+import RichTextEditor, {
+  RichTextEditoruseImperativeHandleReturnType,
+} from "./RichTextEditor/RichTextEditor";
 
 const { Item } = Form;
 const { Option } = Select;
@@ -27,11 +30,22 @@ const mapDispatchToProps = {};
 type AddUpdateProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
 
+/**
+ * @description 添加商品页面
+ * @param {AddUpdateProps} props
+ * @constructor
+ */
 const AddUpdate: FC<AddUpdateProps> = (props: AddUpdateProps) => {
   const [categoryList, setCategoryList] = useState<CategoryObjType[]>([]);
   const match = useMatch("/admin/prud_about/product/addupdate/:id");
-  const pictureWallRef = useRef<useImperativeHandleReturnType>(null);
   const navigate = useNavigate();
+
+  /**
+   * @description 照片墙和富文本的Ref
+   */
+  const PictureWallRef = useRef<PictualWalluseImperativeHandleReturnType>(null);
+  const RichTextEditorRef =
+    useRef<RichTextEditoruseImperativeHandleReturnType>(null);
 
   const getCategoryList = async () => {
     let result = (await reqCategoryList()) as unknown as CategoryListType;
@@ -51,11 +65,26 @@ const AddUpdate: FC<AddUpdateProps> = (props: AddUpdateProps) => {
     }
   }, []);
 
-  const onFinish = (values: AddProductType) => {
-    let imgs = pictureWallRef.current?.getImgArr();
-    values = { ...values, imgs };
+  const onFinish = async (values: AddProductType) => {
+    //从pictureWall中获取图片数组
+    let imgs = PictureWallRef.current?.getImgArr();
+    //从富文本编辑器中获取转换为富文本的字符串
+    let details = RichTextEditorRef.current?.getRichText() as string;
+    values = { ...values, imgs, details };
     console.log("发请求了");
     console.log(values);
+    let result = (await reqAddProduct(
+      values
+    )) as unknown as AddProductReturnType;
+    const { status, msg } = result;
+    if (!status) {
+      message.success("添加商品成功");
+      setTimeout(() => {
+        navigate("/admin/prud_about/product", { replace: true });
+      }, 1000);
+    } else {
+      message.error(msg);
+    }
   };
 
   const onFinishFailed = (errorInfo: unknown) => {
@@ -130,11 +159,10 @@ const AddUpdate: FC<AddUpdateProps> = (props: AddUpdateProps) => {
           </Select>
         </Item>
         <Item label="商品图片">
-          <PictureWall ref={pictureWallRef} />
+          <PictureWall ref={PictureWallRef} />
         </Item>
         <Item label="商品详情">
-          <RichTextEditor />
-          <h1>Test</h1>
+          <RichTextEditor ref={RichTextEditorRef} />
         </Item>
         <Button type="primary" htmlType="submit">
           提交

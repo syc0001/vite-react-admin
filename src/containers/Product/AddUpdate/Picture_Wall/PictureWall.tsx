@@ -1,11 +1,15 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
 import {useState, useImperativeHandle, forwardRef, Ref} from "react";
-import { PlusOutlined } from "@ant-design/icons";
-import { message, Modal, Upload } from "antd";
-import type { RcFile, UploadProps } from "antd/es/upload";
-import type { UploadFile } from "antd/es/upload/interface";
-import { BASE_URL } from "../../../../config";
-import { AddPhotoType, DeletePhotoType } from "../../../../type/api";
-import { reqDeletePhoto } from "../../../../api";
+import {PlusOutlined} from "@ant-design/icons";
+import {message, Modal, Upload} from "antd";
+import type {RcFile, UploadProps} from "antd/es/upload";
+import type {UploadFile} from "antd/es/upload/interface";
+import {BASE_URL} from "../../../../config";
+import {AddPhotoType, DeletePhotoType} from "../../../../type/Photo";
+import {reqDeletePhoto} from "../../../../api";
 
 const getBase64 = (file: RcFile): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -15,11 +19,18 @@ const getBase64 = (file: RcFile): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
-export type useImperativeHandleReturnType = {
+/**
+ * @description 照片墙Ref返回类型
+ */
+export type PictualWalluseImperativeHandleReturnType = {
   getImgArr: () => string[];
 };
 
-const PictureWall = forwardRef((_, PictureWallRef:Ref<unknown>) => {
+/**
+ * @description 照片墙
+ * @constructor
+ */
+const PictureWall = forwardRef((_, PictureWallRef: Ref<unknown>) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -39,7 +50,7 @@ const PictureWall = forwardRef((_, PictureWallRef:Ref<unknown>) => {
     );
   };
 
-  const handleChange: UploadProps["onChange"] = async ({ file, fileList }) => {
+  const handleChange: UploadProps["onChange"] = async ({file, fileList}) => {
     if (file.status === "done") {
       file.url = (file.response as AddPhotoType).data.url;
       file.name = (file.response as AddPhotoType).data.name;
@@ -48,7 +59,7 @@ const PictureWall = forwardRef((_, PictureWallRef:Ref<unknown>) => {
       let result = (await reqDeletePhoto(
         file.name
       )) as unknown as DeletePhotoType;
-      const { status, msg } = result;
+      const {status, msg} = result;
       if (status === 0) {
         message.success("删除图片成功");
       } else {
@@ -66,7 +77,11 @@ const PictureWall = forwardRef((_, PictureWallRef:Ref<unknown>) => {
     return result;
   };
 
-  useImperativeHandle(PictureWallRef, (): useImperativeHandleReturnType => {
+  /**
+   * @description 自定义返回Ref类型
+   * @return PictualWalluseImperativeHandleReturnType
+   */
+  useImperativeHandle(PictureWallRef, (): PictualWalluseImperativeHandleReturnType => {
     return {
       getImgArr,
     };
@@ -74,8 +89,8 @@ const PictureWall = forwardRef((_, PictureWallRef:Ref<unknown>) => {
 
   const uploadButton = (
     <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
+      <PlusOutlined/>
+      <div style={{marginTop: 8}}>Upload</div>
     </div>
   );
   return (
@@ -97,7 +112,7 @@ const PictureWall = forwardRef((_, PictureWallRef:Ref<unknown>) => {
         footer={null}
         onCancel={handleCancel}
       >
-        <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        <img alt="example" style={{width: "100%"}} src={previewImage}/>
       </Modal>
     </>
   );

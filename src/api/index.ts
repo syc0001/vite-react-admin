@@ -1,19 +1,33 @@
-import myAxios from "./myAxios";
-import {BASE_URL, A_MAP_KEY, CITY_CODE} from "../config";
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ import myAxios from "./myAxios";
+ */
+import { BASE_URL, A_MAP_KEY, CITY_CODE } from "../config";
 import jsonp from "jsonp";
-import {message} from "antd";
+import { message } from "antd";
+import myAxios from "./myAxios";
+import { AddProductType } from "../type/Product";
 
-//登录请求
+/**
+ * @description 登录请求
+ * @param {string} username 用户名
+ * @param {string} password 密码
+ */
 export const reqLogin = (username: string, password: string) => {
-  return myAxios.post(`${BASE_URL}/login`, {username, password});
+  return myAxios.post(`${BASE_URL}/login`, { username, password });
 };
 
-//获取商品列表请求
+/**
+ * @description 获取商品列表请求
+ */
 export const reqCategoryList = () => {
   return myAxios.get(`${BASE_URL}/manage/category/list`);
 };
 
-//获取天气信息
+/**
+ * @description 获取天气信息
+ */
 export const reqWeather = () => {
   return new Promise((resolve, reject) => {
     jsonp(
@@ -22,24 +36,36 @@ export const reqWeather = () => {
       (err, data) => {
         if (err) {
           message.error("请求天气接口失败,请联系管理员");
-          return new Promise(() => {
-          });
+          return new Promise(() => {});
         }
-        const {weather, temperature} = data.lives[0];
-        resolve({weather, temperature});
+        const { weather, temperature } = data.lives[0];
+        resolve({ weather, temperature });
       }
     );
   });
 };
 
+/**
+ * @description 添加商品类型
+ * @param {string} categoryName 商品名称
+ */
 export const reqAddCategory = (categoryName: string) => {
-  return myAxios.post(`${BASE_URL}/manage/category/add`, {categoryName});
+  return myAxios.post(`${BASE_URL}/manage/category/add`, { categoryName });
 };
 
+/**
+ * @description 更新商品类型
+ * @param {Object} categoryObj 商品类型对象
+ */
 export const reqUpdateCategory = (categoryObj: {}) => {
   return myAxios.post(`${BASE_URL}/manage/category/update`, categoryObj);
 };
 
+/**
+ * @description 请求商品列表
+ * @param {number} pageNum 页数
+ * @param {number} pageSize 一页几项
+ */
 export const reqProductList = (pageNum: number, pageSize: number) => {
   return myAxios.get(`${BASE_URL}/manage/product/list`, {
     params: {
@@ -49,6 +75,11 @@ export const reqProductList = (pageNum: number, pageSize: number) => {
   });
 };
 
+/**
+ * @description 更新商品列表
+ * @param {number} productId 商品id
+ * @param {number} status 状态
+ */
 export const reqUpdateProductList = (productId: string, status: number) => {
   return myAxios.post(`${BASE_URL}/manage/product/updateStatus`, {
     productId,
@@ -56,6 +87,13 @@ export const reqUpdateProductList = (productId: string, status: number) => {
   });
 };
 
+/**
+ * @description 查询商品列表
+ * @param {string} pageNum 页数
+ * @param {string} pageSize 一页几项
+ * @param {any} searchType 查找类型
+ * @param {any} searchKey 查找键
+ */
 export const reqSearchProductList = (
   pageNum: number,
   pageSize: number,
@@ -71,6 +109,10 @@ export const reqSearchProductList = (
   });
 };
 
+/**
+ * @description 根据id得到商品
+ * @param {string} productId 商品id
+ */
 export const reqProdById = (productId: string) => {
   return myAxios.get(`${BASE_URL}/manage/product/info`, {
     params: {
@@ -79,8 +121,22 @@ export const reqProdById = (productId: string) => {
   });
 };
 
+/**
+ * @description 删除照片
+ * @param {string} name 照片名称
+ */
 export const reqDeletePhoto = (name: string) => {
   return myAxios.post(`${BASE_URL}/manage/img/delete`, {
     name,
+  });
+};
+
+/**
+ * @description 添加商品
+ * @param {AddProductType} productObj
+ */
+export const reqAddProduct = (productObj: AddProductType) => {
+  return myAxios.post(`${BASE_URL}/manage/product/add`, {
+    ...productObj,
   });
 };

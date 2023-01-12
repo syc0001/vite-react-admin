@@ -1,20 +1,16 @@
 import { SAVE_USER_INFO, DELETE_USER_INFO } from "../action_types";
 import { action_types } from "./action_types";
+import {UserDataType} from "../../type/Login";
 
-export interface LoginStateType {
-  user: { [key: string]: any };
-  token: string;
-  isLogin: boolean;
-}
 
 interface login_types extends action_types {
-  data: LoginStateType;
+  data: UserDataType;
 }
 
 let user = JSON.parse(localStorage.getItem("user") as string);
 let token = localStorage.getItem("token") as string;
 
-const LoginState: LoginStateType = {
+const LoginState: UserDataType = {
   user: user || {},
   token: token,
   isLogin: !!(user && token),
@@ -23,9 +19,9 @@ const LoginState: LoginStateType = {
 const loginReducer = (
   preState = LoginState,
   actions: login_types
-): LoginStateType => {
+): UserDataType => {
   const { type, data } = actions;
-  let newState: LoginStateType;
+  let newState: UserDataType;
   switch (type) {
     case SAVE_USER_INFO:
       newState = { user: data.user, token: data.token, isLogin: true };

@@ -1,3 +1,8 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -9,6 +14,10 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
+/**
+ * @description 根组件
+ * @constructor
+ */
 root.render(
   <Provider store={store}>
     <BrowserRouter>

@@ -4,6 +4,9 @@ import loginReducer from "./login_reducer";
 import menuReducer from "./menu_reducer";
 import ProductReducer from "./product_reducer";
 
+/**
+ * @description 汇总的总类型
+ */
 const reducers = {
   userInfo: loginReducer,
   title: menuReducer,

@@ -1,4 +1,4 @@
-import { ProductType } from "../../type/api";
+import { ProductType } from "../../type/Product";
 import { SAVE_PROD_LIST } from "../action_types";
 import { action_types } from "./action_types";
 

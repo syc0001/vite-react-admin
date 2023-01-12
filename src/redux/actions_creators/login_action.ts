@@ -1,7 +1,7 @@
 import { SAVE_USER_INFO, DELETE_USER_INFO } from "../action_types";
-import { LoginStateType } from "../reducers/login_reducer";
+import { UserDataType } from "../../type/Login";
 
-export const createSaveUserInfoAction = (value: LoginStateType) => {
+export const createSaveUserInfoAction = (value: UserDataType) => {
   localStorage.setItem("user", JSON.stringify(value.user));
   localStorage.setItem("token", value.token);
   localStorage.setItem("isLogin", "true");

@@ -15,7 +15,7 @@ import { createDeleteUserInfoAction } from "../../../redux/actions_creators/logi
 import { reqWeather } from "../../../api";
 import titles from "../../../config/titleConfig";
 import menuList from "../../../config/menuConfig";
-import { WeatherType } from "../../../type/api";
+import { WeatherType } from "../../../type";
 import "./css/Header.less";
 
 const { confirm } = Modal;

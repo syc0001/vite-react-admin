@@ -1,3 +1,8 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button, Card, Input, message, Select, Table } from "antd";
@@ -14,8 +19,8 @@ import { createSaveProductListAction } from "../../redux/actions_creators/produc
 import {
   ProductListType,
   ProductType,
-  UpdateProductStatusType,
-} from "../../type/api";
+  UpdateProductType,
+} from "../../type/Product";
 import { ColumnsType } from "antd/es/table";
 
 const { Option } = Select;
@@ -29,7 +34,16 @@ const mapDispatchToProps = {
 type ProductProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
 
+/**
+ * 是否在搜索状态
+ */
 let isSearch = false;
+
+/**
+ * @description 商品列表
+ * @param {ProductProps} props redux传入的参数
+ * @constructor
+ */
 const Product: FC<ProductProps> = (props: ProductProps) => {
   const [productList, setProductList] = useState<ProductType[]>([]);
   const [total, setTotal] = useState(0);
@@ -155,7 +169,7 @@ const Product: FC<ProductProps> = (props: ProductProps) => {
     let result = (await reqUpdateProductList(
       _id,
       status
-    )) as unknown as UpdateProductStatusType;
+    )) as unknown as UpdateProductType;
     console.log("updateProdStatus", result);
     const { status: newState } = result;
     if (newState === 0) {

@@ -1,4 +1,8 @@
-// //最核心的管理者
+/**
+ * @description 最核心的管理者
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
 import { applyMiddleware, legacy_createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
