@@ -1,6 +1,7 @@
 /**
  * @description 全局Axios配置
  * @author ShiYiChuang
+ * @date 2023-1-11
  */
 import { message } from "antd";
 import axios, { AxiosError, AxiosResponse } from "axios";

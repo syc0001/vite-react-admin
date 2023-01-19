@@ -3,7 +3,7 @@
  * @date 2023-1-11
  */
 import { FC, forwardRef, useImperativeHandle, Ref, useState } from "react";
-import { EditorState, convertToRaw } from "draft-js";
+import { EditorState, convertToRaw, ContentState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
@@ -14,10 +14,12 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
  */
 export type RichTextEditoruseImperativeHandleReturnType = {
   getRichText: () => string;
+  setRichText: (html: string) => void;
 };
 
 /**
  * @description 富文本编辑器
+ * @constructor
  */
 const RichTextEditor = forwardRef((_, RichTexEditorRef: Ref<unknown>) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty()); //构建一个初始化的编辑器+内容
@@ -37,11 +39,27 @@ const RichTextEditor = forwardRef((_, RichTexEditorRef: Ref<unknown>) => {
     return draftToHtml(convertToRaw(editorState.getCurrentContent()));
   };
 
+  /**
+   * @description 设置富文本编辑器内容
+   * @param {string} html 传入的html样式字符串
+   */
+  const setRichText = (html: string) => {
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(
+        contentBlock.contentBlocks
+      );
+      const editorState = EditorState.createWithContent(contentState);
+      setEditorState(editorState);
+    }
+  };
+
   useImperativeHandle(
     RichTexEditorRef,
     (): RichTextEditoruseImperativeHandleReturnType => {
       return {
         getRichText,
+        setRichText,
       };
     }
   );

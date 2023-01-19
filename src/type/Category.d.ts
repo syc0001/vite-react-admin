@@ -1,3 +1,8 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
 import { BaseType } from "./index";
 
 /**

@@ -1,10 +1,17 @@
-import {BaseType} from "./index";
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
+import { BaseType } from "./index";
+import { RoleType } from "./Role";
+import { UserType } from "./User";
 
 /**
  * @description 用户数据
  */
 export interface UserDataType {
-  user: { [key: string]: any };
+  user: (UserType & { role: RoleType });
   token: string;
   isLogin: boolean;
 }

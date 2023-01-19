@@ -1,26 +1,31 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-13
+ */
+
 import { FC, useEffect, useState } from "react";
 import { useMatch, useNavigate } from "react-router-dom";
 import { Button, Card, List, message } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
-import "./css/Detail.less";
 import { reducersType } from "../../../redux/reducers";
 import { reqCategoryList, reqProdById } from "../../../api";
 import { BASE_URL } from "../../../config";
 import { ProductByIdType, ProductType } from "../../../type/Product";
 import { CategoryListType } from "../../../type/Category";
+import Modules from "./css/Detail.module.less";
 
 const { Item } = List;
 
+// redux状态 start ========================================================================
 const mapStateToProps = (state: reducersType) => ({
   productList: state.productList,
   categoryList: state.categoryList,
 });
-
 const mapDispatchToProps = {};
-
 type DetailProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
+// redux状态 end ==========================================================================
 
 const Detail: FC<DetailProps> = (props: DetailProps) => {
   const [productData, setProductData] = useState<ProductType>({
@@ -39,6 +44,10 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
   const match = useMatch("/admin/prud_about/product/detail/:id");
   const navigate = useNavigate();
 
+  /**
+   * @description 通过id获取商品
+   * @param {string} id 传入的id
+   */
   const getProductById = async (id: string) => {
     let result = (await reqProdById(id)) as unknown as ProductByIdType;
     const { status, data, msg } = result;
@@ -49,6 +58,9 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
     }
   };
 
+  /**
+   * @description 获取分类列表
+   */
   const getCategoryList = async () => {
     let result = (await reqCategoryList()) as unknown as CategoryListType;
     const { status, data, msg } = result;
@@ -80,6 +92,9 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
     }
   }, []);
 
+  /**
+   * productData更新完成后获取分类列表
+   */
   useEffect(() => {
     if (Object.values(productData).length) {
       const reduxCategoryList = props.categoryList;
@@ -100,7 +115,7 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
   return (
     <Card
       title={
-        <div className="left-top">
+        <div className={Modules.leftTop}>
           <Button
             type="link"
             onClick={() => {
@@ -116,23 +131,23 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
     >
       <List>
         <Item>
-          <span className="prod">商品名称: </span>
+          <span className={Modules.prod}>商品名称: </span>
           <span>{productData.name}</span>
         </Item>
         <Item>
-          <span className="prod">商品描述: </span>
+          <span className={Modules.prod}>商品描述: </span>
           <span>{productData.desc}</span>
         </Item>
         <Item>
-          <span className="prod">商品价格: </span>
+          <span className={Modules.prod}>商品价格: </span>
           <span>{productData.price}</span>
         </Item>
         <Item>
-          <span className="prod">所属分类: </span>
+          <span className={Modules.prod}>所属分类: </span>
           <span>{productName}</span>
         </Item>
         <Item>
-          <span className="prod">商品图片: </span>
+          <span className={Modules.prod}>商品图片: </span>
           {productData.imgs == null
             ? ""
             : productData.imgs.map((item: unknown, index: number) => {
@@ -146,7 +161,7 @@ const Detail: FC<DetailProps> = (props: DetailProps) => {
               })}
         </Item>
         <Item>
-          <span className="prod-detail">商品详情: </span>
+          <span className={Modules.prodDetail}>商品详情: </span>
           <span dangerouslySetInnerHTML={{ __html: productData.detail }}></span>
         </Item>
       </List>

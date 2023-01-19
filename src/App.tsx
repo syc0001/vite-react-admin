@@ -8,7 +8,7 @@ import routers from "./routes/";
 import "./App.less";
 
 /**
- * 整体页面
+ * @description 整体页面
  * @constructor
  */
 const App: FC<unknown> = () => {

@@ -1,10 +1,15 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
 import { FC, useEffect, useState } from "react";
 import {
   FullscreenOutlined,
   FullscreenExitOutlined,
   QuestionCircleOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
-import { Button, ConfigProvider } from "antd";
+import { Button } from "antd";
 import screenFull from "screenfull";
 import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
@@ -16,19 +21,19 @@ import { reqWeather } from "../../../api";
 import titles from "../../../config/titleConfig";
 import menuList from "../../../config/menuConfig";
 import { WeatherType } from "../../../type";
-import "./css/Header.less";
+import Modules from "./css/Header.module.less";
 
 const { confirm } = Modal;
 
+// redux状态 start ========================================================================
 const mapStateToProps = (state: reducersType) => ({
   userInfo: state.userInfo,
   title: state.title,
 });
-
 const mapDispatchToProps = { deleteUser: createDeleteUserInfoAction };
-
 type HeaderProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
+// redux状态 end ==========================================================================
 
 const Header: FC<HeaderProps> = (props: HeaderProps) => {
   const [date, setDate] = useState(dayjs().format("YYYY-MM-DD HH:mm:ss"));
@@ -38,10 +43,40 @@ const Header: FC<HeaderProps> = (props: HeaderProps) => {
   const [title, setTitle] = useState("");
   const pathName = useLocation().pathname;
 
+  /**
+   * 组件挂载的时候取得时间,初始化天气,获取标题
+   */
+  useEffect(() => {
+    let timer = setInterval(() => {
+      setDate(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+    }, 1000);
+    initWeatherAndTemperature();
+    GetTitle(pathName);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  /**
+   * 设置全屏
+   */
+  useEffect(() => {
+    screenFull.on("change", setFullChange);
+    return () => {
+      screenFull.off("change", setFullChange);
+    };
+  }, [isFull]);
+
+  /**
+   * @description 设置是否全屏
+   */
   const setFullChange = () => {
     setFull(!isFull);
   };
 
+  /**
+   * @description 初始化天气
+   */
   const initWeatherAndTemperature = async () => {
     let result = (await reqWeather()) as unknown as WeatherType;
     const { weather, temperature } = result;
@@ -49,6 +84,10 @@ const Header: FC<HeaderProps> = (props: HeaderProps) => {
     setTemperature(temperature);
   };
 
+  /**
+   * @description 获取标题
+   * @param {string} pathName 路径名称
+   */
   const GetTitle = (pathName: string) => {
     let result = "";
     if (pathName.includes("product")) {
@@ -71,29 +110,16 @@ const Header: FC<HeaderProps> = (props: HeaderProps) => {
     setTitle(result);
   };
 
-  useEffect(() => {
-    let timer = setInterval(() => {
-      setDate(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-    }, 1000);
-    initWeatherAndTemperature();
-    GetTitle(pathName);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  //isFull update
-  useEffect(() => {
-    screenFull.on("change", setFullChange);
-    return () => {
-      screenFull.off("change", setFullChange);
-    };
-  }, [isFull]);
-
+  /**
+   * @description 设置全屏
+   */
   const fullScreen = () => {
     screenFull.toggle();
   };
 
+  /**
+   * @description 生成退出的弹窗
+   */
   const logOut = () => {
     confirm({
       icon: <QuestionCircleOutlined />,
@@ -107,26 +133,29 @@ const Header: FC<HeaderProps> = (props: HeaderProps) => {
   };
 
   return (
-    <header className="header">
-      <div className="header-top">
+    <header className={Modules.header}>
+      <div className={Modules.headerTop}>
         <Button size={"small"} onClick={fullScreen}>
           {isFull ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
         </Button>
-        <span className="username">欢迎,{props.userInfo.user.username}</span>
+        <span className={Modules.username}>
+          欢迎,{props.userInfo.user.username}
+        </span>
         <Button
-          className="logOut-btn"
+          className={Modules.logOutBtn}
           type="link"
           size="small"
           onClick={logOut}
+          icon={<LogoutOutlined />}
         >
           退出登录
         </Button>
       </div>
-      <div className="header-bottom">
-        <div className="header-bottom-left">
+      <div className={Modules.headerBottom}>
+        <div className={Modules.headerBottomLeft}>
           {titles.get(props.title) || title}
         </div>
-        <div className="header-bottom-right">
+        <div className={Modules.headerBottomRight}>
           <span>{date}</span>
           <img
             src="http://api.map.baidu.com/images/weather/day/qing.png"

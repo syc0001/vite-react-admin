@@ -2,15 +2,15 @@
  * @author ShiYiChuang
  * @date 2023-1-11
  */
-import {FC, useEffect, useState} from "react";
-import {Button, Card, message, Modal, Table, Form, Input} from "antd";
-import {PlusCircleOutlined} from "@ant-design/icons";
-import {connect} from "react-redux";
-import {reqAddCategory, reqCategoryList, reqUpdateCategory} from "../../api";
-import {PAGE_SIZE} from "../../config";
-import {RuleObject} from "antd/lib/form";
-import {reducersType} from "../../redux/reducers";
-import {createSaveCategoryListAction} from "../../redux/actions_creators/category_action";
+import { FC, useEffect, useState } from "react";
+import { Button, Card, message, Modal, Table, Form, Input } from "antd";
+import { PlusCircleOutlined } from "@ant-design/icons";
+import { connect } from "react-redux";
+import { reqAddCategory, reqCategoryList, reqUpdateCategory } from "../../api";
+import { PAGE_SIZE } from "../../config";
+import { RuleObject } from "antd/lib/form";
+import { reducersType } from "../../redux/reducers";
+import { createSaveCategoryListAction } from "../../redux/actions_creators/category_action";
 import {
   AddCategoryType,
   NewCategoryObjType,
@@ -18,22 +18,22 @@ import {
   CategoryListType,
   UpdateCategoryType,
 } from "../../type/Category";
-import {ColumnsType} from "antd/es/table";
+import { ColumnsType } from "antd/es/table";
 
-const {Item} = Form;
+const { Item } = Form;
 
+// redux状态 start ========================================================================
 const mapStateToProps = (state: reducersType) => ({});
-
-const mapDispatchToProps = {saveCategory: createSaveCategoryListAction};
-
+const mapDispatchToProps = { saveCategory: createSaveCategoryListAction };
 type CategoryProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
+// redux状态 end ==========================================================================
 
 // let initialTitle = "";
 
 /**
  * @description 分类页面
- * @param {CategoryProps} props
+ * @param {CategoryProps} props redux传入的参数
  * @constructor
  */
 const Category: FC<CategoryProps> = (props: CategoryProps) => {
@@ -43,8 +43,14 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
   const [isLoading, setLoading] = useState(true);
   const [modalCurrentValue, setModalCurrentValue] = useState("");
   const [initialTitle, setInitialTitle] = useState("");
-  const form = Form.useForm()[0];
+  /**
+   * 用来控制表单的Ref
+   */
+  const [formRef] = Form.useForm();
 
+  /**
+   * Table的行数据
+   */
   const columns: ColumnsType<{}> = [
     {
       title: "分类名称",
@@ -60,8 +66,6 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
             type="link"
             onClick={() => {
               setInitialTitle(operatorData.name);
-              setTimeout(() => {
-              }, 300);
               showModal("update", operatorData);
             }}
           >
@@ -74,58 +78,80 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
     },
   ];
 
+  /**
+   * @description 组件挂载时候获取商品列表
+   */
+  useEffect(() => {
+    getCategoryList();
+  }, []);
+
+  /**
+   * @description initialTitle更新的时候重置表单
+   */
+  useEffect(() => {
+    formRef.resetFields();
+  }, [initialTitle]);
+
+  /**
+   * @description 获取商品列表
+   */
   const getCategoryList = async () => {
     let result = (await reqCategoryList()) as unknown as CategoryListType;
     setLoading(false);
-    const {status, data, msg} = result;
+    const { status, data, msg } = result;
     if (status === 0) {
-      setCategoryList(data);
-      props.saveCategory(data);
+      setCategoryList([...data].reverse());
+      props.saveCategory(data.reverse());
     } else {
       message.error(msg, 1);
     }
   };
 
-  useEffect(() => {
-    getCategoryList();
-  }, []);
-
-  useEffect(() => {
-    form.resetFields();
-  }, [initialTitle]);
-
-  //Component Callback
-  const toAdd = async (values: string) => {
-    let result = (await reqAddCategory(values)) as unknown as AddCategoryType;
-    const {status, data, msg} = result;
+  /**
+   * @description 添加分类
+   * @param {string} categoryName 当前新增商品名称
+   */
+  const toAdd = async (categoryName: string) => {
+    console.log(categoryName);
+    let result = (await reqAddCategory(
+      categoryName
+    )) as unknown as AddCategoryType;
+    const { status, data, msg } = result;
     if (status === 0) {
       message.success("新增商品分类成功", 1);
       let newData = [data, ...categoryList];
       setCategoryList(newData);
-      form.resetFields();
+      formRef.resetFields();
       setIsModalOpen(false);
     } else if (status === 1) {
       message.error(msg, 1);
     }
   };
 
+  /**
+   * @description 更新分类
+   * @param {NewCategoryObjType} categoryObj 当前更新的分类对象
+   */
   const toUpdate = async (categoryObj: NewCategoryObjType) => {
     let result = (await reqUpdateCategory(
       categoryObj
     )) as unknown as UpdateCategoryType;
-    const {status, msg} = result;
+    const { status, msg } = result;
     if (status === 0) {
       message.success("更新分类名称成功", 1);
       getCategoryList();
-      form.resetFields();
+      formRef.resetFields();
       setIsModalOpen(false);
     } else if (status === 1) {
       message.error(msg, 1);
     }
   };
 
+  /**
+   * @description 模态框点击确认的回调
+   */
   const handleOk = () => {
-    form
+    formRef
       .validateFields()
       .then((value: { categoryName: string }) => {
         if (operType === "add") {
@@ -133,28 +159,42 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
         } else if (operType === "update") {
           const categoryId = modalCurrentValue;
           const categoryName = value.categoryName;
-          const categoryObj: NewCategoryObjType = {categoryId, categoryName};
+          const categoryObj: NewCategoryObjType = { categoryId, categoryName };
           toUpdate(categoryObj);
         }
       })
       .catch((err: string) => {
-        message.warning("表单输入有误,请检查", 1);
+        message.error("表单输入有误,请检查", 1);
       });
   };
 
+  /**
+   * @description 模态框点击取消的回调
+   */
   const handleCancel = () => {
-    form.resetFields();
+    formRef.resetFields();
     setIsModalOpen(false);
   };
 
+  /**
+   * @description 显示模态框
+   * @param operator 操作状态
+   * @param data 数据
+   */
   const showModal = (operator: string, data: CategoryObjType | null = null) => {
     setOperType(operator);
+    // setInitialTitle("");
     if (data !== null) {
       setModalCurrentValue(data._id);
     }
     setIsModalOpen(true);
   };
 
+  /**
+   * @description 输入框的验证函数
+   * @param {RuleObject} rule
+   * @param {string} value
+   */
   const inputValidator = (
     rule: RuleObject,
     value: string
@@ -173,24 +213,26 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
           <Button
             type="primary"
             onClick={() => {
+              setInitialTitle("");
               showModal("add");
             }}
           >
             <PlusCircleOutlined></PlusCircleOutlined>添加
           </Button>
         }
-        style={{width: "100%"}}
+        style={{ width: "100%" }}
       >
         <Table
           dataSource={categoryList}
           columns={columns}
           bordered
           rowKey={"_id"}
-          pagination={{pageSize: PAGE_SIZE, showQuickJumper: true}}
+          pagination={{ pageSize: PAGE_SIZE, showQuickJumper: true }}
           loading={isLoading}
         />
       </Card>
       <Modal
+        forceRender //设置强制渲染
         title={operType === "add" ? "新增商品" : "修改商品"}
         open={isModalOpen}
         okText="确定"
@@ -198,13 +240,18 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form name="basic" initialValues={{remember: false}} form={form}>
+        <Form
+          name="basic"
+          initialValues={{ remember: false }}
+          form={formRef}
+          onFinish={handleOk}
+        >
           <Item
             name="categoryName"
             initialValue={initialTitle}
-            rules={[{validator: inputValidator}]}
+            rules={[{ validator: inputValidator }]}
           >
-            <Input placeholder="请输入商品分类名称"/>
+            <Input placeholder="请输入商品分类名称" />
           </Item>
         </Form>
       </Modal>

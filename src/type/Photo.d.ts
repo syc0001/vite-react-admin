@@ -1,4 +1,9 @@
 /**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
+/**
  * @description 照片类型
  */
 interface PhotoData {

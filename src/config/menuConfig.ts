@@ -1,18 +1,23 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
 /*
  * 导航菜单配置
  */
 const menuList = [
   {
-    title: "首页", //* 菜单标题名称
+    title: "首页", //菜单标题名称
     key: "home", //展开的key
-    path: "/admin/home", //* 对应的path
+    path: "/admin/home", //对应的path
   },
   {
     title: "商品",
     key: "prud_about",
     path: "/admin/prud_about",
     children: [
-      //* 子菜单列表
+      //子菜单列表
       {
         title: "商品分类管理",
         key: "category",

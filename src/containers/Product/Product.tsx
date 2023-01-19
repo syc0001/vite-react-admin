@@ -1,6 +1,6 @@
 /**
  * @author ShiYiChuang
- * @date 2023-1-11
+ * @date 2023-1-13
  */
 
 import { ChangeEvent, FC, useEffect, useState } from "react";
@@ -25,14 +25,16 @@ import { ColumnsType } from "antd/es/table";
 
 const { Option } = Select;
 
-const mapStateToProps = (state: reducersType) => ({});
-
+// redux状态 start ========================================================================
+const mapStateToProps = (state: reducersType) => ({
+  productList: state.productList,
+});
 const mapDispatchToProps = {
   saveProduct: createSaveProductListAction,
 };
-
 type ProductProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
+// redux状态 end ==========================================================================
 
 /**
  * 是否在搜索状态
@@ -47,12 +49,15 @@ let isSearch = false;
 const Product: FC<ProductProps> = (props: ProductProps) => {
   const [productList, setProductList] = useState<ProductType[]>([]);
   const [total, setTotal] = useState(0);
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(1);
   const [searchKey, setSearchKey] = useState("");
   const [searchType, setSearchType] = useState("productName");
   const pathName = useLocation().pathname.split("/");
   const navigate = useNavigate();
 
+  /**
+   * Table的行
+   */
   const columns: ColumnsType<{}> = [
     {
       title: "商品名称",
@@ -88,7 +93,7 @@ const Product: FC<ProductProps> = (props: ProductProps) => {
               danger={status === 1}
               type="primary"
               onClick={() => {
-                updateProdStatus(item);
+                updateProductStatus(item);
               }}
             >
               {status === 1 ? "下架" : "上架"}
@@ -130,6 +135,10 @@ const Product: FC<ProductProps> = (props: ProductProps) => {
     },
   ];
 
+  /**
+   * @description 获取商品列表
+   * @param {number} page 当前页面
+   */
   const getProductList = async (page: number = 1) => {
     let result: ProductListType;
     if (isSearch) {
@@ -156,11 +165,21 @@ const Product: FC<ProductProps> = (props: ProductProps) => {
     }
   };
 
+  /**
+   * @description 组件挂载的时候获取分类列表
+   */
   useEffect(() => {
     getProductList();
   }, []);
 
-  const updateProdStatus = async ({ _id, status } = { _id: "", status: 0 }) => {
+  /**
+   * @description 更新产品状态
+   * @param {string} _id 产品id
+   * @param {number} status 状态
+   */
+  const updateProductStatus = async (
+    { _id, status } = { _id: "", status: 0 }
+  ) => {
     if (status === 1) {
       status = 2;
     } else {
@@ -170,7 +189,6 @@ const Product: FC<ProductProps> = (props: ProductProps) => {
       _id,
       status
     )) as unknown as UpdateProductType;
-    console.log("updateProdStatus", result);
     const { status: newState } = result;
     if (newState === 0) {
       message.success("更新商品状态成功", 1);
@@ -187,16 +205,16 @@ const Product: FC<ProductProps> = (props: ProductProps) => {
     }
   };
 
+  /**
+   * @description 搜索回调
+   */
   const search = async () => {
-    if (searchKey === "") {
-      isSearch = false;
-    } else {
-      isSearch = true;
-    }
+    //判断是否是搜索状态
+    isSearch = searchKey !== "";
     getProductList();
   };
 
-  if (pathName.includes("addupdate") || pathName.includes("detail")) {
+  if (pathName.includes("detail")) {
     return <Outlet />;
   }
   return (

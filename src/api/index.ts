@@ -1,13 +1,14 @@
 /**
  * @author ShiYiChuang
  * @date 2023-1-11
- import myAxios from "./myAxios";
  */
 import { BASE_URL, A_MAP_KEY, CITY_CODE } from "../config";
 import jsonp from "jsonp";
 import { message } from "antd";
 import myAxios from "./myAxios";
-import { AddProductType } from "../type/Product";
+import { AddOrUpdateProductType } from "../type/Product";
+import { UpdateRoleType } from "../type/Role";
+import { AddUserFormType } from "../type/User";
 
 /**
  * @description 登录请求
@@ -133,10 +134,66 @@ export const reqDeletePhoto = (name: string) => {
 
 /**
  * @description 添加商品
- * @param {AddProductType} productObj
+ * @param {AddOrUpdateProductType} productObj 添加的商品对象
  */
-export const reqAddProduct = (productObj: AddProductType) => {
-  return myAxios.post(`${BASE_URL}/manage/product/add`, {
-    ...productObj,
+export const reqAddProduct = (productObj: AddOrUpdateProductType) => {
+  return myAxios.post(`${BASE_URL}/manage/product/add`, productObj);
+};
+
+/**
+ * @description 更新商品
+ * @param {AddOrUpdateProductType} productObj 更新的商品对象
+ */
+export const reqUpdateProduct = (productObj: AddOrUpdateProductType) => {
+  console.log("reqUpdateProduct:", productObj);
+  return myAxios.post(`${BASE_URL}/manage/product/update`, productObj);
+};
+
+/**
+ * @description 获取角色列表
+ * @param {number} pageNum 页数
+ * @param {number} pageSize 一页几项
+ */
+export const reqRoleList = (pageNum: number, pageSize: number) => {
+  return myAxios.get(`${BASE_URL}/manage/role/list`, {
+    params: {
+      pageNum,
+      pageSize,
+    },
   });
+};
+
+/**
+ * @description 添加角色
+ * @param {string} roleName 角色名字
+ */
+export const reqAddRole = (roleName: string) => {
+  return myAxios.post(`${BASE_URL}/manage/role/add`, {
+    roleName,
+  });
+};
+
+/**
+ * @description 更新角色
+ * @param {UpdateRoleType} roleObj 更新角色对象
+ */
+export const reqAuthRole = (roleObj: UpdateRoleType) => {
+  return myAxios.post(`${BASE_URL}/manage/role/update`, {
+    ...roleObj,
+  });
+};
+
+/**
+ * @description 获取用户列表(同时携带着角色列表)
+ */
+export const reqUserList = () => {
+  return myAxios.get(`${BASE_URL}/manage/user/list`);
+};
+
+/**
+ * @description 请求添加用户
+ * @param {AddUserFormType} userObj 用户对象
+ */
+export const reqAddUser = (userObj: AddUserFormType) => {
+  return myAxios.post(`${BASE_URL}/manage/user/add`, userObj);
 };

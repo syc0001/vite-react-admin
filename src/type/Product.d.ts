@@ -1,4 +1,9 @@
 /**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
+/**
  * @description 商品类型
  */
 export interface ProductType {
@@ -49,22 +54,22 @@ export interface ProductByIdType {
 }
 
 /**
- * @description 添加商品
+ * @description 添加或更新商品
  */
-export interface AddProductType {
+export interface AddOrUpdateProductType {
+  _id?: string;
   name: string;
   desc: string;
   price: number;
   categoryId: string;
   imgs?: string[];
-  details?: string;
+  detail?: string;
 }
-
 
 /**
  * @description 添加商品返回类型
  */
-export interface AddProductReturnType {
+export interface AddOrUpdateProductReturnType {
   status: number;
   data: ProductType;
   msg?: string;

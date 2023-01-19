@@ -1,3 +1,11 @@
+/**
+ * @author ShiYiChuang
+ * @date 2023-1-11
+ */
+
+/**
+ * 标题配置项,Map
+ */
 const titles = new Map<string, string>();
 titles.set("home", "首页");
 titles.set("category", "商品分类管理");
