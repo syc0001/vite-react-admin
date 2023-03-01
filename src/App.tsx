@@ -13,7 +13,7 @@ import "./App.less";
  */
 const App: FC<unknown> = () => {
   /**
-   * @description 获取路由表元素
+   * 获取路由表元素
    */
   const RouteElement = useRoutes(routers);
   return <>{RouteElement}</>;

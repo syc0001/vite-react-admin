@@ -262,7 +262,7 @@ const Role: FC<RoleProps> = (props) => {
       </Modal>
       {/* 分配角色模态框 */}
       <Modal
-        title={`分配权限`}
+        title="分配权限"
         open={isShowAuth}
         onOk={handleAuthOkModal}
         onCancel={handleAuthCancelModal}

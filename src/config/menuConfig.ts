@@ -19,7 +19,7 @@ const menuList = [
     children: [
       //子菜单列表
       {
-        title: "商品分类管理",
+        title: "分类管理",
         key: "category",
         path: "/admin/prud_about/category",
       },

@@ -10,7 +10,7 @@ import { createDeleteUserInfoAction } from "../../redux/actions_creators/login_a
 import { Layout } from "antd";
 import Header from "./Header/Header";
 import LeftNav from "./LeftNav/LeftNav";
-import Modules from './css/Admin.module.less'
+import Modules from "./css/Admin.module.less";
 
 const { Footer, Sider, Content } = Layout;
 
@@ -30,22 +30,21 @@ type AdminProps = ReturnType<typeof mapStateToProps> &
  */
 const Admin: FC<AdminProps> = (props: AdminProps) => {
   const { isLogin } = props.userInfo;
-
   //如果没有登录,跳回登录页面
   if (!isLogin) {
     return <Navigate to={"/"} />;
   }
   return (
     <Layout className={Modules.adminContainer} style={{ height: "100%" }}>
-      <Sider className={Modules.s}>
+      <Sider className={Modules.sider}>
         <LeftNav />
       </Sider>
       <Layout>
         <Header />
-        <Content className="content">
+        <Content className={Modules.content}>
           <Outlet />
         </Content>
-        <Footer className="footer">
+        <Footer className={Modules.footer}>
           推荐使用Chrome浏览器,获得最佳用户体验
         </Footer>
       </Layout>

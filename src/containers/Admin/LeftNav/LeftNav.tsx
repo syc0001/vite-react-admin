@@ -17,9 +17,9 @@ import {
 } from "@ant-design/icons";
 import { connect } from "react-redux";
 import { Menu } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SelectInfo } from "rc-menu/lib/interface";
 import logo from "../../../static/images/logo.png";
-import { useLocation, useNavigate } from "react-router-dom";
 import { reducersType } from "../../../redux/reducers";
 import { createSaveTitleAction } from "../../../redux/actions_creators/menu_action";
 import Modules from "./css/LeftNav.module.less";
@@ -54,7 +54,7 @@ function getItem(
 const ItemsMap = {
   home: getItem("首页", "home", <HomeOutlined />),
   prud_about: getItem("商品", "prud_about", <AppstoreOutlined />, [
-    getItem("商品分类管理", "category", <UnorderedListOutlined />),
+    getItem("分类管理", "category", <UnorderedListOutlined />),
     getItem("商品管理", "product", <ToolOutlined />),
   ]),
   user: getItem("用户管理", "user", <UserOutlined />),
@@ -124,7 +124,7 @@ const LeftNav: FC<LeftNavProps> = (props: LeftNavProps) => {
     props.saveTitle(route.key);
     navigate(`/admin/${pathName}`, { replace: false });
   };
-
+  console.log("locationArr:", locationArr);
   return (
     <div style={{ width: "100%" }}>
       <header className={Modules.navHeader}>
@@ -134,7 +134,8 @@ const LeftNav: FC<LeftNavProps> = (props: LeftNavProps) => {
       <Menu
         selectedKeys={[
           locationArr.includes("product") ? "product" : locationArr[0],
-        ]}
+          //确保商品管理子界面中导航条是选中的状态
+        ]} 
         defaultOpenKeys={locationArr}
         mode="inline"
         theme="dark"
