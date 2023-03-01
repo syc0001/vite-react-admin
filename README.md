@@ -1,7 +1,7 @@
 # 通过 vite 搭建的react商品管理系统
 
 ## 采用技术: 
-        vite + React + React-router + Axios + Ant-design + React-redux
+        vite + React + ts + React-router + Axios + Ant-design + React-redux
 
 ## 项目职责:
         1. 使用vite搭建基本项目结构, 对项目进行模块化划分, 并集成Axios请求库
