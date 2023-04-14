@@ -9,6 +9,7 @@ import myAxios from "./myAxios";
 import { AddOrUpdateProductType } from "../type/Product";
 import { UpdateRoleType } from "../type/Role";
 import { AddUserFormType } from "../type/User";
+import { WeatherType } from "../type";
 
 /**
  * @description 登录请求
@@ -40,7 +41,7 @@ export const reqWeather = () => {
           return new Promise(() => {});
         }
         const { weather, temperature } = data.lives[0];
-        resolve({ weather, temperature });
+        resolve({ weather, temperature } as WeatherType);
       }
     );
   });

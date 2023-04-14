@@ -2,7 +2,7 @@
  * @author ShiYiChuang
  * @date 2023-1-11
  */
-import { useState, FC } from "react";
+import {useState, FC, ReactNode, Key} from "react";
 import {
   ContainerOutlined,
   HomeOutlined,
@@ -15,27 +15,27 @@ import {
   LineChartOutlined,
   BarChartOutlined,
 } from "@ant-design/icons";
-import { connect } from "react-redux";
-import { Menu } from "antd";
-import { useLocation, useNavigate } from "react-router-dom";
-import { SelectInfo } from "rc-menu/lib/interface";
+import {connect} from "react-redux";
+import {Menu} from "antd";
+import {useLocation, useNavigate} from "react-router-dom";
+import {SelectInfo} from "rc-menu/lib/interface";
 import logo from "../../../static/images/logo.png";
-import { reducersType } from "../../../redux/reducers";
-import { createSaveTitleAction } from "../../../redux/actions_creators/menu_action";
+import {reducersType} from "../../../redux/reducers";
+import {createSaveTitleAction} from "../../../redux/actions_creators/menu_action";
 import Modules from "./css/LeftNav.module.less";
 
 type MyMenuItem = {
-  label: React.ReactNode;
+  label: ReactNode;
   key: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   children?: MyMenuItem[];
   type?: "group";
 };
 
 function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
+  label: ReactNode,
+  key: Key,
+  icon?: ReactNode,
   children?: MyMenuItem[],
   type?: "group"
 ): MyMenuItem {
@@ -52,25 +52,25 @@ function getItem(
  * 自定义Item映射
  */
 const ItemsMap = {
-  home: getItem("首页", "home", <HomeOutlined />),
-  prud_about: getItem("商品", "prud_about", <AppstoreOutlined />, [
-    getItem("分类管理", "category", <UnorderedListOutlined />),
-    getItem("商品管理", "product", <ToolOutlined />),
+  home: getItem("首页", "home", <HomeOutlined/>),
+  prud_about: getItem("商品", "prud_about", <AppstoreOutlined/>, [
+    getItem("分类管理", "category", <UnorderedListOutlined/>),
+    getItem("商品管理", "product", <ToolOutlined/>),
   ]),
-  user: getItem("用户管理", "user", <UserOutlined />),
-  role: getItem("角色管理", "role", <SafetyOutlined />),
-  echats: getItem("图形图表", "echats", <ContainerOutlined />, [
-    getItem("柱形图", "bar", <BarChartOutlined />),
-    getItem("折线图", "line", <LineChartOutlined />),
-    getItem("饼图", "pie", <PieChartOutlined />),
+  user: getItem("用户管理", "user", <UserOutlined/>),
+  role: getItem("角色管理", "role", <SafetyOutlined/>),
+  echats: getItem("图形图表", "echats", <ContainerOutlined/>, [
+    getItem("柱形图", "bar", <BarChartOutlined/>),
+    getItem("折线图", "line", <LineChartOutlined/>),
+    getItem("饼图", "pie", <PieChartOutlined/>),
   ]),
 };
 
 // let items: MyMenuItem[] = [];
 
 // redux状态 start ========================================================================
-const mapStateToProps = (state: reducersType) => ({ userInfo: state.userInfo });
-const mapDispatchToProps = { saveTitle: createSaveTitleAction };
+const mapStateToProps = (state: reducersType) => ({userInfo: state.userInfo});
+const mapDispatchToProps = {saveTitle: createSaveTitleAction};
 type LeftNavProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
 // redux状态 end ==========================================================================
@@ -102,7 +102,7 @@ const LeftNav: FC<LeftNavProps> = (props: LeftNavProps) => {
     let key: keyof typeof ItemsMap;
     for (key in ItemsMap) {
       if (ItemsMap[key].children) {
-        let tmp = { ...ItemsMap[key] };
+        let tmp = {...ItemsMap[key]};
         tmp.children = ItemsMap[key].children?.filter((item) => {
           return set.has(item.key);
         });
@@ -122,20 +122,20 @@ const LeftNav: FC<LeftNavProps> = (props: LeftNavProps) => {
   const chooseRouteAndSave = (route: SelectInfo) => {
     const pathName = route.keyPath.reverse().join("/");
     props.saveTitle(route.key);
-    navigate(`/admin/${pathName}`, { replace: false });
+    navigate(`/admin/${pathName}`, {replace: false});
   };
   console.log("locationArr:", locationArr);
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{width: "100%"}}>
       <header className={Modules.navHeader}>
-        <img src={logo} alt="" />
+        <img src={logo} alt=""/>
         <h1>商品管理系统</h1>
       </header>
       <Menu
         selectedKeys={[
           locationArr.includes("product") ? "product" : locationArr[0],
           //确保商品管理子界面中导航条是选中的状态
-        ]} 
+        ]}
         defaultOpenKeys={locationArr}
         mode="inline"
         theme="dark"
