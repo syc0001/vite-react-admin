@@ -46,7 +46,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
   /**
    * 用来控制表单的Ref
    */
-  const [formRef] = Form.useForm();
+  const [FormRef] = Form.useForm();
 
   /**
    * Table的行数据
@@ -89,7 +89,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
    * @description initialTitle更新的时候重置表单
    */
   useEffect(() => {
-    formRef.resetFields();
+    FormRef.resetFields();
   }, [initialTitle]);
 
   /**
@@ -121,7 +121,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
       message.success("新增商品分类成功", 1);
       let newData = [data, ...categoryList];
       setCategoryList(newData);
-      formRef.resetFields();
+      FormRef.resetFields();
       setIsModalOpen(false);
     } else if (status === 1) {
       message.error(msg, 1);
@@ -140,7 +140,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
     if (status === 0) {
       message.success("更新分类名称成功", 1);
       getCategoryList();
-      formRef.resetFields();
+      FormRef.resetFields();
       setIsModalOpen(false);
     } else if (status === 1) {
       message.error(msg, 1);
@@ -151,7 +151,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
    * @description 模态框点击确认的回调
    */
   const handleOk = () => {
-    formRef
+    FormRef
       .validateFields()
       .then((value: { categoryName: string }) => {
         if (operType === "add") {
@@ -172,7 +172,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
    * @description 模态框点击取消的回调
    */
   const handleCancel = () => {
-    formRef.resetFields();
+    FormRef.resetFields();
     setIsModalOpen(false);
   };
 
@@ -243,7 +243,7 @@ const Category: FC<CategoryProps> = (props: CategoryProps) => {
         <Form
           name="basic"
           initialValues={{ remember: false }}
-          form={formRef}
+          form={FormRef}
           onFinish={handleOk}
         >
           <Item

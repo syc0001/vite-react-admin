@@ -4,14 +4,24 @@
  */
 import { FC, useEffect, useState } from "react";
 import { Button, Card, Form, Input, message, Modal, Select, Table } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import { ColumnsType } from "antd/lib/table";
 import { PAGE_SIZE } from "../../config";
-import { reqAddUser, reqUserList } from "../../api";
+import {
+  reqAddUser,
+  reqDeleteUser,
+  reqUpdateUser,
+  reqUserList,
+} from "../../api";
 import {
   AddUserFormType,
   AddUserReturnType,
+  DeleteUserReturnType,
+  UpdateUserReturnType,
   UserListReturnType,
   UserType,
 } from "../../type/User";
@@ -25,7 +35,10 @@ const { Option } = Select;
  * @constructor
  */
 const User: FC<unknown> = () => {
-  const [isShowAdd, setIsShowAdd] = useState(false);
+  const [isShowModel, setIsShowModel] = useState(false);
+  const [isShowDel, setIsShowDel] = useState(false);
+  const [isNewAdd, setIsNewAdd] = useState(false);
+  const [user, setUser] = useState<UserType>();
   const [userList, setUserList] = useState<UserType[]>([]);
   const [roleList, setRoleList] = useState<RoleType[]>([]);
   /**
@@ -82,11 +95,21 @@ const User: FC<unknown> = () => {
       render: (item: UserType) => {
         return (
           <>
-            <Button type="link">修改</Button>
             <Button
               type="link"
               onClick={() => {
-                deleteUser(item);
+                setUser(item);
+                setIsShowModel(true);
+                setIsNewAdd(false);
+              }}
+            >
+              修改
+            </Button>
+            <Button
+              type="link"
+              onClick={() => {
+                setUser(item);
+                setIsShowDel(true);
               }}
             >
               删除
@@ -106,6 +129,10 @@ const User: FC<unknown> = () => {
     getUserList();
   }, []);
 
+  useEffect(() => {
+    FormRef.resetFields();
+  }, [user]);
+
   /**
    * @description 获取用户列表
    */
@@ -120,42 +147,85 @@ const User: FC<unknown> = () => {
     }
   };
 
-  /**
-   * @description 删除用户
-   * @param item
-   */
-  const deleteUser = (item: UserType) => {
-    console.log(item);
-  };
-
-  /**
-   * @description 新增用户确定的回调
-   */
-  const handleOk = () => {
-    FormRef.validateFields()
-      .then(async (item: AddUserFormType) => {
-        let result = (await reqAddUser(item)) as unknown as AddUserReturnType;
-        const { status, data, msg } = result;
+  const addAndUpdateUserOk = () => {
+    if (isNewAdd) {
+      // add
+      FormRef.validateFields()
+        .then(async (item: AddUserFormType) => {
+          let result = (await reqAddUser(item)) as unknown as AddUserReturnType;
+          const { status, data, msg } = result;
+          if (status === 0) {
+            message.success("添加用户成功");
+            setUserList([data, ...userList]);
+            FormRef.resetFields();
+          } else {
+            message.error(msg);
+          }
+          setIsShowModel(false);
+        })
+        .catch(() => {
+          message.error("表单输入有误,请检查!", 1);
+        });
+    } else {
+      // update
+      let tmp_user = {
+        _id: user!._id,
+        username: user!.username,
+        phone: user!.phone,
+        email: user!.email,
+        role_id: user!.role_id,
+        create_time: user!.create_time,
+        __v: user!.__v,
+      } as UserType;
+      FormRef.validateFields().then(async (item: UserType) => {
+        const commonKeys = ["username", "phone", "email", "role_id"];
+        if (item.password !== undefined) {
+          tmp_user["password"] = item.password;
+        }
+        for (const key of commonKeys) {
+          (tmp_user as any)[key] = (item as any)[key];
+        }
+        let result = (await reqUpdateUser(
+          tmp_user
+        )) as unknown as UpdateUserReturnType;
+        const { status, msg } = result;
         if (status === 0) {
-          message.success("添加用户成功");
-          setUserList([data, ...userList]);
-          FormRef.resetFields();
-          setIsShowAdd(false);
+          message.success("修改成功");
         } else {
           message.error(msg);
         }
-      })
-      .catch(() => {
-        message.error("表单输入有误,请检查!", 1);
+        setIsShowModel(false);
+        getUserList();
       });
+    }
+  };
+
+  const addAndUpdateUserCancel = () => {
+    setIsShowModel(false);
   };
 
   /**
-   * @description 新增用户取消的回调
+   * @description 删除用户确定的回调
    */
-  const handleCancel = () => {
-    FormRef.resetFields();
-    setIsShowAdd(false);
+  const deleteUserOk = async () => {
+    let result = (await reqDeleteUser(
+      user!._id
+    )) as unknown as DeleteUserReturnType;
+    const { status } = result;
+    if (status === 0) {
+      message.success("删除成功", 2);
+      getUserList();
+    } else {
+      message.error("删除失败", 2);
+    }
+    setIsShowDel(false);
+  };
+
+  /**
+   * @description 删除用户取消的回调
+   */
+  const deleteUserCancel = () => {
+    setIsShowDel(false);
   };
 
   return (
@@ -165,7 +235,9 @@ const User: FC<unknown> = () => {
           <Button
             type="primary"
             onClick={() => {
-              setIsShowAdd(true);
+              setUser(undefined);
+              setIsShowModel(true);
+              setIsNewAdd(true);
             }}
           >
             <PlusCircleOutlined></PlusCircleOutlined>
@@ -185,36 +257,39 @@ const User: FC<unknown> = () => {
           rowKey="_id"
         />
       </Card>
-      {/* 添加角色模态框 */}
+      {/* 添加和修改角色模态框 */}
       <Modal
-        title="新增用户"
-        open={isShowAdd}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        forceRender
+        title={isNewAdd ? "新增用户" : "修改用户"}
+        open={isShowModel}
+        onOk={addAndUpdateUserOk}
+        onCancel={addAndUpdateUserCancel}
         okText="确认"
         cancelText="取消"
       >
-        <Form form={FormRef} labelCol={{ md: 4 }} wrapperCol={{ md: 18 }}>
+        <Form
+          form={FormRef}
+          labelCol={{ md: 4 }}
+          wrapperCol={{ md: 18 }}
+          initialValues={{
+            username: user?.username,
+            email: user?.email,
+            phone: user?.phone,
+            role_id: user?.role_id,
+          }}
+        >
           <Item
             label="用户名"
             name="username"
-            rules={[
-              { required: true, message: "请输入你的用户名" },
-              { min: 4, message: "用户名必须大于等于4位" },
-              { max: 12, message: "用户名必须小于等于12位" },
-              {
-                pattern: /^\w+$/,
-                message: "用户名必须是字母、数字、下划线组成",
-              },
-            ]}
+            rules={[{ required: true, message: "请输入你的用户名" }]}
           >
-            <Input autoComplete="off" placeholder="请输入商品名称" />
+            <Input autoComplete="off" placeholder="请输入用户名" />
           </Item>
           <Item
             label="密码"
             name="password"
             rules={[
-              { required: true, message: "请输入你的密码" },
+              { required: isNewAdd, message: "请输入你的密码" },
               { min: 4, message: "密码必须大于等于4位" },
               { max: 12, message: "密码必须小于等于12位" },
               {
@@ -226,7 +301,9 @@ const User: FC<unknown> = () => {
             <Input
               type={"password"}
               autoComplete="off"
-              placeholder="请输入商品描述"
+              placeholder={
+                isNewAdd ? "请输入密码" : "如果不修改密码, 请保持为空"
+              }
             />
           </Item>
           <Item label="邮箱" name="email">
@@ -250,6 +327,19 @@ const User: FC<unknown> = () => {
           </Item>
         </Form>
       </Modal>
+      {/* 删除角色模态框 */}
+      <Modal
+        title={
+          <>
+            <ExclamationCircleOutlined /> &nbsp; 确认删除用户吗?
+          </>
+        }
+        open={isShowDel}
+        onOk={deleteUserOk}
+        onCancel={deleteUserCancel}
+        okText="确认"
+        cancelText="取消"
+      ></Modal>
     </>
   );
 };

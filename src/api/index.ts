@@ -7,8 +7,8 @@ import jsonp from "jsonp";
 import { message } from "antd";
 import myAxios from "./myAxios";
 import { AddOrUpdateProductType } from "../type/Product";
-import { UpdateRoleType } from "../type/Role";
-import { AddUserFormType } from "../type/User";
+import { AuthRoleType, RoleType } from "../type/Role";
+import { AddUserFormType, UserType } from "../type/User";
 import { WeatherType } from "../type";
 
 /**
@@ -175,13 +175,21 @@ export const reqAddRole = (roleName: string) => {
 };
 
 /**
- * @description 更新角色
- * @param {UpdateRoleType} roleObj 更新角色对象
+ * @description 授权角色
+ * @param {AuthRoleType} roleObj 授权角色对象
  */
-export const reqAuthRole = (roleObj: UpdateRoleType) => {
+export const reqAuthRole = (roleObj: AuthRoleType) => {
   return myAxios.post(`${BASE_URL}/manage/role/update`, {
     ...roleObj,
   });
+};
+
+/**
+ * @description 删除角色
+ * @param {RoleType} roleObj 删除角色对象
+ */
+export const reqDeleteRole = (roleObj: RoleType) => {
+  return myAxios.post(`${BASE_URL}/manage/role/delete`, roleObj);
 };
 
 /**
@@ -197,4 +205,20 @@ export const reqUserList = () => {
  */
 export const reqAddUser = (userObj: AddUserFormType) => {
   return myAxios.post(`${BASE_URL}/manage/user/add`, userObj);
+};
+
+/**
+ * @description 请求更新用户
+ * @param {UserType} user 用户id
+ */
+export const reqUpdateUser = (user: UserType) => {
+  return myAxios.post(`${BASE_URL}/manage/user/update`, user);
+};
+
+/**
+ * @description 请求删除用户
+ * @param {string} userId 用户id
+ */
+export const reqDeleteUser = (userId: string) => {
+  return myAxios.post(`${BASE_URL}/manage/user/delete`, { userId });
 };

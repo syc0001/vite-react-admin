@@ -1,6 +1,7 @@
 const md5 = require("blueimp-md5");
 const UserModel = require("../models/UserModel");
 const RoleModel = require("../models/RoleModel");
+const { status } = require("nprogress");
 
 /*
 注册用户管理路由
@@ -41,6 +42,10 @@ module.exports = function (router) {
   // 更新用户
   router.post("/manage/user/update", (req, res) => {
     const user = req.body;
+    if (user.password !== undefined) {
+      user.password = md5(user.password || "atguigu");
+    }
+    console.log(user);
     UserModel.findOneAndUpdate({ _id: user._id }, user)
       .then((oldUser) => {
         const data = Object.assign(oldUser, user);

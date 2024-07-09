@@ -4,17 +4,21 @@
  */
 import { FC, Key, useEffect, useState } from "react";
 import { Button, Card, Form, Input, message, Modal, Table, Tree } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import { ColumnsType } from "antd/lib/table";
 import {
   AddRoleReturnType,
   RoleReturnType,
   RoleType,
-  UpdateRoleReturnType,
-  UpdateRoleType,
+  AuthRoleReturnType,
+  AuthRoleType,
+  DeleteRoleReturnType,
 } from "../../type/Role";
-import { reqAddRole, reqAuthRole, reqRoleList } from "../../api";
+import { reqAddRole, reqAuthRole, reqDeleteRole, reqRoleList } from "../../api";
 import { PAGE_SIZE } from "../../config";
 import menuConfig from "../../config/menuConfig";
 import { connect } from "react-redux";
@@ -40,11 +44,15 @@ type RoleProps = ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps;
  * @constructor
  */
 const Role: FC<RoleProps> = (props) => {
-  const [isShowAdd, setShowAdd] = useState(false);
-  const [isShowAuth, setShowAuth] = useState(false);
+  const [isShowAdd, setIsShowAdd] = useState(false);
+  const [isShowDel, setIsShowDel] = useState(false);
+  const [isShowAuth, setIsShowAuth] = useState(false);
+  const [user, setUser] = useState<RoleType>();
   const [roleList, setRoleList] = useState<RoleType[]>([]);
   const [currentId, setCurrentId] = useState("");
   const [total, setTotal] = useState(1);
+  const [curPage, setCurPage] = useState(1);
+
   /**
    * 设置选中复选框的树节点
    */
@@ -92,19 +100,31 @@ const Role: FC<RoleProps> = (props) => {
       title: "操作",
       key: "option",
       render: (item: RoleType) => (
-        <Button
-          type="link"
-          onClick={() => {
-            let result = roleList.find((role) => role._id == item._id);
-            if (result) {
-              setCheckedKeys(result.menus);
-            }
-            setCurrentId(item._id);
-            setShowAuth(true);
-          }}
-        >
-          设置权限
-        </Button>
+        <>
+          <Button
+            type="link"
+            onClick={() => {
+              let result = roleList.find((role) => role._id == item._id);
+              if (result) {
+                setCheckedKeys(result.menus);
+              }
+              setCurrentId(item._id);
+              setIsShowAuth(true);
+            }}
+          >
+            设置权限
+          </Button>
+          <Button
+            type="link"
+            onClick={() => {
+              console.log(item);
+              setUser(item);
+              setIsShowDel(true);
+            }}
+          >
+            删除
+          </Button>
+        </>
       ),
     },
   ];
@@ -149,7 +169,7 @@ const Role: FC<RoleProps> = (props) => {
         if (status === 0) {
           message.success("新增角色成功");
           getRoleList();
-          setShowAdd(false);
+          setIsShowAdd(false);
         } else {
           message.error(msg);
         }
@@ -163,37 +183,35 @@ const Role: FC<RoleProps> = (props) => {
    * @description 新增角色取消的回调
    */
   const handleCancel = () => {
-    setShowAdd(false);
+    setIsShowAdd(false);
   };
 
   /**
    * @description 权限提示框确定的回调
    */
   const handleAuthOkModal = async () => {
-    let roleObj: UpdateRoleType = {
+    let roleObj: AuthRoleType = {
       _id: currentId,
       menus: checkedKeys,
       auth_name: props.username,
       auth_time: Date.now(),
     };
-    let result = (await reqAuthRole(
-      roleObj
-    )) as unknown as UpdateRoleReturnType;
+    let result = (await reqAuthRole(roleObj)) as unknown as AuthRoleReturnType;
     const { status, msg } = result;
     if (status === 0) {
       message.success("授权成功", 1);
-      getRoleList();
+      getRoleList(curPage);
     } else {
       message.error(msg);
     }
-    setShowAuth(false);
+    setIsShowAuth(false);
   };
 
   /**
    * @description 权限提示框取消的回调
    */
   const handleAuthCancelModal = () => {
-    setShowAuth(false);
+    setIsShowAuth(false);
   };
 
   /**
@@ -206,6 +224,25 @@ const Role: FC<RoleProps> = (props) => {
     setCheckedKeys(checkedKeysValue as string[]);
   };
 
+  const deleteRoleOk = async () => {
+    let result = (await reqDeleteRole(
+      user!
+    )) as unknown as DeleteRoleReturnType;
+    const { status, msg } = result;
+    console.log(result);
+    if (status === 0) {
+      message.success("删除角色成功", 2);
+    } else {
+      message.error(msg, 2);
+    }
+    getRoleList(curPage);
+    setIsShowDel(false);
+  };
+
+  const deleteRoleCancel = () => {
+    setIsShowDel(false);
+  };
+
   return (
     <>
       <Card
@@ -214,7 +251,7 @@ const Role: FC<RoleProps> = (props) => {
             type="primary"
             onClick={() => {
               FormRef.resetFields();
-              setShowAdd(true);
+              setIsShowAdd(true);
             }}
           >
             <PlusCircleOutlined></PlusCircleOutlined>
@@ -231,6 +268,10 @@ const Role: FC<RoleProps> = (props) => {
             defaultPageSize: PAGE_SIZE,
             showQuickJumper: true,
             total: total,
+            onChange: (page) => {
+              setCurPage(page);
+              getRoleList(page);
+            },
           }}
           rowKey="_id"
         />
@@ -279,6 +320,19 @@ const Role: FC<RoleProps> = (props) => {
           />
         </Form>
       </Modal>
+      {/* 删除角色模态框 */}
+      <Modal
+        title={
+          <>
+            <ExclamationCircleOutlined /> &nbsp; 确认删除角色吗?
+          </>
+        }
+        open={isShowDel}
+        onOk={deleteRoleOk}
+        onCancel={deleteRoleCancel}
+        okText="确定"
+        cancelText="取消"
+      ></Modal>
     </>
   );
 };

@@ -6,7 +6,10 @@
 /**
  * 前缀url
  */
+// 设定BaseURL直接跨域请求的时候不需要加api前缀(仅设置生产模式)
+// export const BASE_URL = process.env.NODE_ENV === "production" ? "" : "/api";
 export const BASE_URL = "/api";
+console.log(process.env.NODE_ENV); //development
 
 /**
  * 高德地图的url

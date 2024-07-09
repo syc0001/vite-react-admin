@@ -94,12 +94,7 @@ const FormLogin: FC<LoginProps> = (props: LoginProps) => {
       <Item
         label="用户名"
         name="username"
-        rules={[
-          { required: true, message: "请输入你的用户名" },
-          { min: 4, message: "用户名必须大于等于4位" },
-          { max: 12, message: "用户名必须小于等于12位" },
-          { pattern: /^\w+$/, message: "用户名必须是字母、数字、下划线组成" },
-        ]}
+        rules={[{ required: true, message: "请输入你的用户名" }]}
       >
         <Input prefix={<UserOutlined />} />
       </Item>

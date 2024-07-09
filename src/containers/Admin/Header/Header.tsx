@@ -35,8 +35,8 @@ type HeaderProps = ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps;
 // redux状态 end ==========================================================================
 
-  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 const Header: FC<HeaderProps> = (props: HeaderProps) => {
+  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD HH:mm:ss"));
   const [isFull, setFull] = useState(false);
   const [weather, setWeather] = useState("");
   const [temperature, setTemperature] = useState(0);
@@ -128,6 +128,11 @@ const Header: FC<HeaderProps> = (props: HeaderProps) => {
       okText: "确认",
       onOk: () => {
         props.deleteUser();
+      },
+      okButtonProps: {
+        style: {
+          backgroundColor: "#1DA57A",
+        },
       },
     });
   };

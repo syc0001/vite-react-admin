@@ -15,9 +15,15 @@ const instance = axios.create({
   timeout: 4000,
 });
 
+// 留个记录, 使用baseURL可以直接指定目标服务器, 但是需要允许跨域才能成功请求
+// instance.defaults.baseURL =
+//   process.env.NODE_ENV === "production" ? "http://localhost:5000" : "";
+
 //添加请求拦截器
 instance.interceptors.request.use((config) => {
   // 进度条开始
+  console.log(`config.baseURL: ${config.baseURL}`);
+  console.log(`config.url: ${config.url}`);
   NProgress.start();
   const { token } = store.getState().userInfo;
   if (token) {

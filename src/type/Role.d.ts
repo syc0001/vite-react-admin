@@ -46,7 +46,7 @@ export interface AddRoleReturnType extends BaseType {
 /**
  * @description 更新角色类型
  */
-export interface UpdateRoleType {
+export interface AuthRoleType {
   _id: string;
   menus: Array<string>;
   auth_time: number;
@@ -56,6 +56,11 @@ export interface UpdateRoleType {
 /**
  * @description 更新角色返回类型
  */
-export interface UpdateRoleReturnType extends BaseType {
+export interface AuthRoleReturnType extends BaseType {
   data: RoleType;
+}
+
+export interface DeleteRoleReturnType {
+  status: number;
+  msg: string;
 }

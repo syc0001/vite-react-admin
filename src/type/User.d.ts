@@ -52,3 +52,14 @@ export interface AddUserFormType {
 export interface AddUserReturnType extends BaseType {
   data: UserType;
 }
+
+/**
+ * @description 删除用户返回类型
+ */
+export interface DeleteUserReturnType {
+  status: number;
+}
+
+export interface UpdateUserReturnType extends BaseType {
+  data: UserType;
+}

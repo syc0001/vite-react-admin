@@ -51,9 +51,9 @@ module.exports = function (router) {
   //删除角色
   router.post("/manage/role/delete", (req, res) => {
     const role = req.body;
-    RoleModel.deleteOne({_id:role._id})
+    RoleModel.deleteOne({ _id: role._id })
       .then((oldRole) => {
-        res.send({ status: 0})
+        res.send({ status: 0 });
       })
       .catch((error) => {
         console.error("删除角色异常", error);
